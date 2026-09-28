@@ -24,7 +24,7 @@ kv_t *kv_init(size_t capacity) {
     return table;
 }
 
-size_t hash(const char *val, const size_t capacity) {
+size_t hash(char *val, size_t capacity) {
     if (!val || capacity == 0) {
         return 0;
     }
@@ -50,7 +50,7 @@ size_t hash(const char *val, const size_t capacity) {
 // returns: the index of the key, otherwise
 // on error, returns -1, on not found return -2
 
-int kv_put(kv_t *db, const char *key, const char *value) {
+int kv_put(kv_t *db, char *key, char *value) {
     if (!db || !key || !value) {
         return -1;
     }
