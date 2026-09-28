@@ -47,8 +47,8 @@ size_t hash(char *val, size_t capacity) {
 //  - db: a pointer to the db
 //  - key: a pointer to the key
 //  - value: a pointer to the value itself
-// returns: the index of the key, otherwise
-// on error, returns -1, on not found return -2
+// returns: 0 if success, otherwise
+// on error return -1, on not found return -2
 
 int kv_put(kv_t *db, char *key, char *value) {
     if (!db || !key || !value) {
@@ -145,13 +145,13 @@ char *kv_get(kv_t *db, char *key) {
         size_t real_idx = (idx + i) % db->capacity;
         kv_entry_t *entry = &db->entries[real_idx];
 
+        if (entry->key == TOMBSTONE) {
+            continue;
+        }
+
         // if no key, return nothing
         if (entry->key == NULL) {
             return NULL;
-        }
-
-        if (entry->key == TOMBSTONE) {
-            continue;
         }
 
         // find an entry and the keys match
@@ -160,4 +160,42 @@ char *kv_get(kv_t *db, char *key) {
         }
     }
     return NULL;
+}
+
+// fn kv_put
+// params:
+//  - db: a pointer to the db
+//  - key: a pointer to the key value
+//  returns: 0 if deletion success, otherwise
+//  on not found return -1
+
+int kv_delete(kv_t *db, char *key) {
+    if (!db || !key || db->capacity == 0) {
+        return -1;
+    }
+
+    size_t idx = hash(key, db->capacity);
+
+    for (size_t i = 0; i < db->capacity; i++) {
+        size_t real_idx = (idx + i) % db->capacity;
+        kv_entry_t *entry = &db->entries[real_idx];
+
+        if (entry->key == TOMBSTONE) {
+            continue;
+        }
+
+        if (entry->key == NULL) {
+            return -1;
+        }
+
+        if (strcmp(entry->key, key) == 0) {
+            free(entry->key);
+            free(entry->value);
+            entry->key = TOMBSTONE;
+            entry->value = NULL;
+            db->count--;
+            return 0;
+        }
+    }
+    return -1;
 }

@@ -16,4 +16,10 @@ int main() {
     char *val3 = kv_get(table, "this doesnt exist");
 
     printf("%s %s %s\n", val1, val2, val3);
+
+    kv_delete(table, "hehe");
+    val1 = NULL;
+    val1 = kv_get(table, "hehe");
+    
+    printf("%s %s %s\n", val1, val2, val3);
 }
