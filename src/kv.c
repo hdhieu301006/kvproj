@@ -199,3 +199,27 @@ int kv_delete(kv_t *db, char *key) {
     }
     return -1;
 }
+
+// fn kv_free
+// params:
+//  - db: a pointer to the db
+
+void kv_free(kv_t *db) {
+    if (!db) {
+        return;
+    }
+    if (db->entries) {
+        for (size_t i = 0; i < db->capacity; i++) {
+            kv_entry_t *entry = &db->entries[i];
+            
+            if (entry->key == NULL || entry->key == TOMBSTONE) {
+                continue;
+            }
+
+            free(entry->key);
+            free(entry->value);
+        }
+        free(db->entries);
+    }
+    free(db);
+}
