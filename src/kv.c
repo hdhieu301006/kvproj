@@ -126,3 +126,38 @@ int kv_put(kv_t *db, char *key, char *value) {
     // the db is occupied
     return -2;
 }
+
+// fn kv_get
+// params:
+//  - db: a pointer to the db
+//  - key: a pointer to the key value
+//  returns: the pointer to the value
+//  NULL if not found
+
+char *kv_get(kv_t *db, char *key) {
+    if (!db || !key || db->capacity == 0) {
+        return NULL;
+    }
+
+    size_t idx = hash(key, db->capacity);
+
+    for (size_t i = 0; i < db->capacity; i++) {
+        size_t real_idx = (idx + i) % db->capacity;
+        kv_entry_t *entry = &db->entries[real_idx];
+
+        // if no key, return nothing
+        if (entry->key == NULL) {
+            return NULL;
+        }
+
+        if (entry->key == TOMBSTONE) {
+            continue;
+        }
+
+        // find an entry and the keys match
+        if(strcmp(entry->key, key) == 0) {
+            return entry->value;
+        }
+    }
+    return NULL;
+}
